@@ -110,7 +110,7 @@ function handle(DOM_node) {
 			var jqNode = $(DOM_node);
 			var type;
 			if(DOM_node.tagName === "INPUT" && (type = jqNode.attr("type"))
-				&& (type.toLowerCase() === "submit" || type.toLowerCase() === "text")
+				&& (type.toLowerCase() === "submit" || type.toLowerCase() === "text" || type.toLowerCase() === "search")
 				&& (jqNode.attr("value") || jqNode.val())) {
 					var newText = replaceText(jqNode.val());
 				jqNode.attr("value", newText);
