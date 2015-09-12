@@ -13,7 +13,8 @@ var OVERRIDE = {
 
 var GLOBAL = {
 	MONEY: "money",
-	CASH: "cash"
+	CASH: "cash",
+	AUTO_UPDATE_INPUT: false
 }
 
 $(document).ready(function() {
@@ -47,18 +48,20 @@ function monitor() {
 	observer.observe(document.body, config);
 
 	// Event handlers to fire for textareas and input boxes:
-	$("textarea").change(function(e) {
-		walk(e.target);
-	});
-	$("textarea").keypress(function(e) {
-		walk(e.target);
-	});
-	$("input").change(function(e) {
-		walk(e.target);
-	});
-	$("input").keypress(function(e) {
-		walk(e.target);
-	});
+	if(GLOBAL.AUTO_UPDATE_INPUT) {
+		$("textarea").change(function(e) {
+			walk(e.target);
+		});
+		$("textarea").keypress(function(e) {
+			walk(e.target);
+		});
+		$("input").change(function(e) {
+			walk(e.target);
+		});
+		$("input").keypress(function(e) {
+			walk(e.target);
+		});
+	}
 }
 
 function walk(node) {
@@ -146,6 +149,8 @@ function replaceText(text) {
 	// the replacement function to turn cash or money into cash money
 	var replaceCashMoney = function(match_string, capture1, offset, original) {
 		// match_string is either "cash" or "money" (the case of each letter can be anything)
+		console.log("original:");console.log(original);
+		console.log(match_string);
 
 		// If matched "money" need to check that "cash" didn't come before it
 		if(match_string.toLowerCase() === GLOBAL.MONEY) {
@@ -156,6 +161,7 @@ function replaceText(text) {
 				return expandCashMoney(match_string, GLOBAL.MONEY); // expand appropriately
 			}
 		} else if(match_string.toLowerCase() === GLOBAL.CASH) { // matched "cash" which is safe
+		console.log("safe cash");
 			return expandCashMoney(match_string, GLOBAL.CASH);
 		} else {
 			return match_string; // should never happen
