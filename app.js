@@ -104,7 +104,6 @@ function handle(node) {
 			// properly updated when the user types (since we're getting this info from
 			// keypress/change events). And, when setting the new value, we should set both
 			// the attribute as well as the actual seen value, using .attr and .val
-
 		}
 	}
 }
