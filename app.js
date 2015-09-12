@@ -124,6 +124,8 @@ function replaceText(text) {
 	// finds cash or money (case-insensitive); only finds cash if it's not followed
 	// by money; however, will still match 'money' in 'cash money'
 	var regex = /\b((?:cash(?!\s*money))|money)\b/gi;
+	// var regexCash = /\b(cash(?!\s*money))\b/gi;
+	// var regexMoney = /\b(money)\b/gi;
 
 	// expands 'cash' or 'money' (case-insensitive) into cash money (with correct casing)
 	var expandCashMoney = function(str, thing) {
@@ -149,19 +151,16 @@ function replaceText(text) {
 	// the replacement function to turn cash or money into cash money
 	var replaceCashMoney = function(match_string, capture1, offset, original) {
 		// match_string is either "cash" or "money" (the case of each letter can be anything)
-		console.log("original:");console.log(original);
-		console.log(match_string);
 
 		// If matched "money" need to check that "cash" didn't come before it
 		if(match_string.toLowerCase() === GLOBAL.MONEY) {
-			var tokens = original.slice(0, offset).trim().split(" ");
+			var tokens = text.slice(0, offset).trim().split(" ");
 			if(tokens[tokens.length - 1].search(/cash/i) >= 0) {
 				return match_string; // do nothing with the match
 			} else {
 				return expandCashMoney(match_string, GLOBAL.MONEY); // expand appropriately
 			}
 		} else if(match_string.toLowerCase() === GLOBAL.CASH) { // matched "cash" which is safe
-		console.log("safe cash");
 			return expandCashMoney(match_string, GLOBAL.CASH);
 		} else {
 			return match_string; // should never happen
