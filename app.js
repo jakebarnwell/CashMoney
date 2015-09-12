@@ -1,21 +1,29 @@
 
-var EXCLUDE = {
-	"SCRIPT": true,
-	"NOSCRIPT": true
+var OVERRIDE = {
+	INCLUDE: {
+		"FORM": "placeholder",
+		"IMG": "alt",
+		"TEXTAREA": "placeholder"
+	},
+	EXCLUDE: {
+		"SCRIPT": true,
+		"NOSCRIPT": true
+	}
 }
 
-var INCLUDE = {
-	"FORM": "placeholder",
-	"IMG": "alt",
-	"TEXTAREA": "placeholder"
+var GLOBAL = {
+	MONEY: "money",
+	CASH: "cash"
 }
-
-var MONEY = 0;
-var CASH = 1;
 
 $(document).ready(function() {
 	CashMoney();
 });
+
+function CashMoney() {
+	walk(document.body);
+	monitor();
+}
 
 function monitor() {
 	var observer = new MutationObserver(function(mutations) {
@@ -66,11 +74,7 @@ function monitor() {
 	});
 }
 
-function CashMoney() {
-	console.log("Ready!");
-	walk(document.body);
-	monitor();
-}
+
 
 function walk(DOM_node) {
 	// console.log("Walking on node:");console.log(DOM_node);
@@ -78,7 +82,7 @@ function walk(DOM_node) {
 
 	var children = DOM_node.childNodes;
 
-	if(!EXCLUDE[DOM_node.tagName]) {
+	if(!OVERRIDE.EXCLUDE[DOM_node.tagName]) {
 		for(var c = 0; c < children.length; c++) {
 			walk(children[c]);
 		}
@@ -91,13 +95,13 @@ function handle(DOM_node) {
 		replaceNodeText(DOM_node);
 		// console.log(DOM_node);
 	} else if(DOM_node.nodeType === Node.ELEMENT_NODE) {
-		if(INCLUDE[DOM_node.tagName]) {
+		if(OVERRIDE.INCLUDE[DOM_node.tagName]) {
 			var jqNode = $(DOM_node);
 			var attribute;
-			if(attribute = jqNode.attr(INCLUDE[DOM_node.tagName])) {
+			if(attribute = jqNode.attr(OVERRIDE.INCLUDE[DOM_node.tagName])) {
 				// console.log(DOM_node);
 				var newText = replaceText(attribute);
-				jqNode.attr(INCLUDE[DOM_node.tagName], newText);
+				jqNode.attr(OVERRIDE.INCLUDE[DOM_node.tagName], newText);
 			}
 		} else {
 			// Very special cases... in particular, for:
@@ -141,14 +145,14 @@ function replaceText(text) {
 	// expands 'cash' or 'money' (case-insensitive) into cash money (with correct casing)
 	var expandCashMoney = function(str, thing) {
 		// console.log(str);
-		if(thing === CASH) {
+		if(thing === GLOBAL.CASH) {
 			switch(str) {
 				case "cash": return "cash money";
 				case "Cash": return "Cash Money";
 				case "CASH": return "CASH MONEY";
 				default: return "cash money";
 			}
-		} else if(thing === MONEY) {
+		} else if(thing === GLOBAL.MONEY) {
 			switch(str) {
 				case "money": return "cash money";
 				case "Money": return "Cash Money";
@@ -165,15 +169,15 @@ function replaceText(text) {
 		// match_string is either "cash" or "money" (the case of each letter can be anything)
 
 		// If matched "money" need to check that "cash" didn't come before it
-		if(match_string.toLowerCase() === "money") {
+		if(match_string.toLowerCase() === GLOBAL.MONEY) {
 			var tokens = original.slice(0, offset).trim().split(" ");
 			if(tokens[tokens.length - 1].search(/cash/i) >= 0) {
 				return match_string; // do nothing with the match
 			} else {
-				return expandCashMoney(match_string, MONEY); // expand appropriately
+				return expandCashMoney(match_string, GLOBAL.MONEY); // expand appropriately
 			}
-		} else if(match_string.toLowerCase() === "cash"){ // matched "cash" which is safe
-			return expandCashMoney(match_string, CASH);
+		} else if(match_string.toLowerCase() === GLOBAL.CASH) { // matched "cash" which is safe
+			return expandCashMoney(match_string, GLOBAL.CASH);
 		} else {
 			return match_string; // should never happen
 		}
@@ -182,14 +186,3 @@ function replaceText(text) {
 	// exec
 	return text.replace(regex, replaceCashMoney);
 }
-
-/*
-TODO:
-input type="submit" value="cash" ...
-input type="text" value="bob" ...
-
-tables
-buttons
-
-on URL change
-*/
