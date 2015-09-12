@@ -27,13 +27,9 @@ function CashMoney() {
 
 function monitor() {
 	var observer = new MutationObserver(function(mutations) {
-		// walk(document.body);
 	    mutations.forEach(function(mutation) {
-			// console.log(mutation.type);
-	        // console.log(mutation.addedNodes);
 			var addedNodes = mutation.addedNodes;
 			if(addedNodes) {
-				// console.log("MORE NODES!");
 				for(var n = 0; n < addedNodes.length; n++) {
 					walk(addedNodes[n]);
 				}
@@ -52,64 +48,48 @@ function monitor() {
 
 	// Event handlers to fire for textareas and input boxes:
 	$("textarea").change(function(e) {
-		// console.log("change");
-		// console.log(e.target);
 		walk(e.target);
 	});
 	$("textarea").keypress(function(e) {
-		// console.log("change");
-		// console.log(e.target);
 		walk(e.target);
 	});
 	$("input").change(function(e) {
-		// console.log("change");
-		// console.log(e.target);
 		walk(e.target);
 	});
 	$("input").keypress(function(e) {
-		console.log("change");
-		console.log(e.target);
-		console.log($(e.target).val());
 		walk(e.target);
 	});
 }
 
+function walk(node) {
+	handle(node);
 
-
-function walk(DOM_node) {
-	// console.log("Walking on node:");console.log(DOM_node);
-	handle(DOM_node);
-
-	var children = DOM_node.childNodes;
-
-	if(!OVERRIDE.EXCLUDE[DOM_node.tagName]) {
+	var children = node.childNodes;
+	if(!OVERRIDE.EXCLUDE[node.tagName]) {
 		for(var c = 0; c < children.length; c++) {
 			walk(children[c]);
 		}
 	}
 }
 
-function handle(DOM_node) {
-	// console.log("Handling...");
-	if(DOM_node.nodeType === Node.TEXT_NODE) {
-		replaceNodeText(DOM_node);
-		// console.log(DOM_node);
-	} else if(DOM_node.nodeType === Node.ELEMENT_NODE) {
-		if(OVERRIDE.INCLUDE[DOM_node.tagName]) {
-			var jqNode = $(DOM_node);
+function handle(node) {
+	if(node.nodeType === Node.TEXT_NODE) {
+		replaceNodeText(node);
+	} else if(node.nodeType === Node.ELEMENT_NODE) {
+		if(OVERRIDE.INCLUDE[node.tagName]) {
+			var jqNode = $(node);
 			var attribute;
-			if(attribute = jqNode.attr(OVERRIDE.INCLUDE[DOM_node.tagName])) {
-				// console.log(DOM_node);
+			if(attribute = jqNode.attr(OVERRIDE.INCLUDE[node.tagName])) {
 				var newText = replaceText(attribute);
-				jqNode.attr(OVERRIDE.INCLUDE[DOM_node.tagName], newText);
+				jqNode.attr(OVERRIDE.INCLUDE[node.tagName], newText);
 			}
 		} else {
 			// Very special cases... in particular, for:
 			// <input type="submit" value="..." ... >
 			// <input type="text" value="..." ... >
-			var jqNode = $(DOM_node);
+			var jqNode = $(node);
 			var type;
-			if(DOM_node.tagName === "INPUT" && (type = jqNode.attr("type"))
+			if(node.tagName === "INPUT" && (type = jqNode.attr("type"))
 				&& (type.toLowerCase() === "submit" || type.toLowerCase() === "text" || type.toLowerCase() === "search")
 				&& (jqNode.attr("value") || jqNode.val())) {
 					var newText = replaceText(jqNode.val());
@@ -126,10 +106,10 @@ function handle(DOM_node) {
 	}
 }
 
-function replaceNodeText(DOM_text_node) {
-	var newText = replaceText(DOM_text_node.nodeValue);
+function replaceNodeText(text_node) {
+	var newText = replaceText(text_node.nodeValue);
 
-	DOM_text_node.nodeValue = newText;
+	text_node.nodeValue = newText;
 }
 
 function replaceText(text) {
@@ -144,7 +124,6 @@ function replaceText(text) {
 
 	// expands 'cash' or 'money' (case-insensitive) into cash money (with correct casing)
 	var expandCashMoney = function(str, thing) {
-		// console.log(str);
 		if(thing === GLOBAL.CASH) {
 			switch(str) {
 				case "cash": return "cash money";
