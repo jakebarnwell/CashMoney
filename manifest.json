@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2,
+
+	"name": "Cash$Money",
+	"description": "This extension turns cash amd money into cash money",
+	"version": "1.0",
+
+	"browser_action": {
+		"default_icon": "icon.png",
+		"default_popup": "popup.html",
+		"default_title": "Cash$Money"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"*://*/*"
+			],
+			"js": [
+				"jquery-2.1.3.js",
+				"jquery.waituntilexists.js",
+				"app.js"
+			],
+			"run_at": "document_end"
+		}
+	]
+}
